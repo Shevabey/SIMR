@@ -20,6 +20,8 @@ class Auth extends CI_Controller
             $data = [
                 'id' => $user->id,
                 'nama' => $user->nama,
+                'username' => $user->username,
+                'role' => $user->role,
                 'login' => true
             ];
 

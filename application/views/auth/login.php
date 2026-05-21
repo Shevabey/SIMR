@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
 </head>
 
@@ -22,7 +23,7 @@
                 <div class="card p-4 shadow">
 
                     <h3 class="text-center mb-4">
-                        Login
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Login
                     </h3>
 
                     <?php if ($this->session->flashdata('auth_error')): ?>
@@ -48,7 +49,7 @@
                     </form>
 
                     <a href="<?= site_url('auth/register_view') ?>" class="btn btn-link w-100 mt-2">
-                        Belum punya akun? Register
+                        <i class="bi bi-person-plus me-1"></i>Belum punya akun? Register
                     </a>
 
                 </div>

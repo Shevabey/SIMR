@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
 </head>
 
@@ -22,7 +23,7 @@
                 <div class="card p-4 shadow">
 
                     <h3 class="text-center mb-4">
-                        Register
+                        <i class="bi bi-person-plus me-2"></i>Register
                     </h3>
 
                     <form method="post" action="<?= site_url('auth/register') ?>">
@@ -40,10 +41,14 @@
                         </div>
 
                         <button class="btn btn-success w-100">
-                            Register
+                            <i class="bi bi-check-circle me-1"></i>Register
                         </button>
 
                     </form>
+
+                    <a href="<?= site_url('auth') ?>" class="btn btn-link w-100 mt-2">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Sudah punya akun? Login
+                    </a>
 
                 </div>
 
