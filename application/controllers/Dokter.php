@@ -22,13 +22,20 @@ class Dokter extends MY_Controller
 
     public function simpan()
     {
+        $dokter_id = $this->input->post('dokter_id');
         $data = [
             'nama' => $this->input->post('nama'),
             'spesialis' => $this->input->post('spesialis'),
             'no_hp' => $this->input->post('no_hp')
         ];
 
-        $this->db->insert('dokter', $data);
+        if (!empty($dokter_id)) {
+            $this->db->update('dokter', $data, ['id' => $dokter_id]);
+            $this->session->set_flashdata('success', 'Data dokter berhasil diperbarui.');
+        } else {
+            $this->db->insert('dokter', $data);
+            $this->session->set_flashdata('success', 'Data dokter berhasil ditambahkan.');
+        }
 
         redirect('dokter');
     }

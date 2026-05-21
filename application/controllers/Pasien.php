@@ -22,6 +22,7 @@ class Pasien extends MY_Controller
 
     public function simpan()
     {
+        $pasien_id = $this->input->post('pasien_id');
         $data = [
             'nama' => $this->input->post('nama'),
             'alamat' => $this->input->post('alamat'),
@@ -29,7 +30,13 @@ class Pasien extends MY_Controller
             'tanggal_lahir' => $this->input->post('tanggal_lahir')
         ];
 
-        $this->db->insert('pasien', $data);
+        if (!empty($pasien_id)) {
+            $this->db->update('pasien', $data, ['id' => $pasien_id]);
+            $this->session->set_flashdata('success', 'Data pasien berhasil diperbarui.');
+        } else {
+            $this->db->insert('pasien', $data);
+            $this->session->set_flashdata('success', 'Data pasien berhasil ditambahkan.');
+        }
 
         redirect('pasien');
     }

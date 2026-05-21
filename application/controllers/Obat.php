@@ -22,13 +22,20 @@ class Obat extends MY_Controller
 
     public function simpan()
     {
+        $obat_id = $this->input->post('obat_id');
         $data = [
             'nama_obat' => $this->input->post('nama_obat'),
             'stok' => $this->input->post('stok'),
             'harga' => $this->input->post('harga')
         ];
 
-        $this->db->insert('obat', $data);
+        if (!empty($obat_id)) {
+            $this->db->update('obat', $data, ['id' => $obat_id]);
+            $this->session->set_flashdata('success', 'Data obat berhasil diperbarui.');
+        } else {
+            $this->db->insert('obat', $data);
+            $this->session->set_flashdata('success', 'Data obat berhasil ditambahkan.');
+        }
 
         redirect('obat');
     }

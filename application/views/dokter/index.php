@@ -25,30 +25,31 @@
             </form>
             <table class="table table-bordered">
 
-            <tr>
-                <th>Nama</th>
-                <th>Spesialis</th>
-                <th>No HP</th>
-                <th>Aksi</th>
-            </tr>
-
-            <?php foreach ($dokter as $d): ?>
-
                 <tr>
-
-                    <td><?= $d->nama ?></td>
-                    <td><?= $d->spesialis ?></td>
-                    <td><?= $d->no_hp ?></td>
-
-                    <td>
-                        <a href="<?= site_url('dokter/hapus/' . $d->id) ?>" class="btn btn-danger btn-sm btn-hapus-data">
-                            Hapus
-                        </a>
-                    </td>
-
+                    <th>Nama</th>
+                    <th>Spesialis</th>
+                    <th>No HP</th>
+                    <th>Aksi</th>
                 </tr>
 
-            <?php endforeach; ?>
+                <?php foreach ($dokter as $d): ?>
+
+                    <tr>
+
+                        <td><?= $d->nama ?></td>
+                        <td><?= $d->spesialis ?></td>
+                        <td><?= $d->no_hp ?></td>
+
+                        <td>
+                            <button type="button" class="btn btn-warning btn-sm btn-edit-dokter" data-id="<?= $d->id ?>" data-nama="<?= htmlspecialchars($d->nama, ENT_QUOTES, 'UTF-8') ?>" data-spesialis="<?= htmlspecialchars($d->spesialis, ENT_QUOTES, 'UTF-8') ?>" data-no_hp="<?= $d->no_hp ?>" data-bs-toggle="modal" data-bs-target="#modalTambahDokter">Edit</button>
+                            <a href="<?= site_url('dokter/hapus/' . $d->id) ?>" class="btn btn-danger btn-sm btn-hapus-data">
+                                Hapus
+                            </a>
+                        </td>
+
+                    </tr>
+
+                <?php endforeach; ?>
 
             </table>
         </div>
@@ -65,15 +66,16 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="post" action="<?= site_url('dokter/simpan') ?>">
+                <input type="hidden" name="dokter_id" id="dokterId" value="">
                 <div class="modal-body">
                     <div class="mb-2">
-                        <input type="text" name="nama" class="form-control" placeholder="Nama Dokter" required>
+                        <input type="text" name="nama" id="dokterNama" class="form-control" placeholder="Nama Dokter" required>
                     </div>
                     <div class="mb-2">
-                        <input type="text" name="spesialis" class="form-control" placeholder="Spesialis" required>
+                        <input type="text" name="spesialis" id="dokterSpesialis" class="form-control" placeholder="Spesialis" required>
                     </div>
                     <div class="mb-2">
-                        <input type="text" name="no_hp" class="form-control" placeholder="No HP" required>
+                        <input type="text" name="no_hp" id="dokterNoHp" class="form-control" placeholder="No HP" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -85,30 +87,53 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.btn-hapus-data').forEach(function (button) {
-        button.addEventListener('click', function (e) {
-            e.preventDefault();
-            const href = this.getAttribute('href');
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    title: 'Yakin hapus data?',
-                    text: 'Data yang dihapus tidak bisa dikembalikan.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, hapus',
-                    cancelButtonText: 'Batal',
-                    confirmButtonColor: '#d33'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = href;
-                    }
-                });
-            } else if (confirm('Yakin hapus data?')) {
-                window.location.href = href;
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalTambahDokter = document.getElementById('modalTambahDokter');
+        const modalTitle = modalTambahDokter.querySelector('.modal-title');
+        const dokterIdInput = document.getElementById('dokterId');
+        const dokterNamaInput = document.getElementById('dokterNama');
+        const dokterSpesialisInput = document.getElementById('dokterSpesialis');
+        const dokterNoHpInput = document.getElementById('dokterNoHp');
+
+        modalTambahDokter.addEventListener('show.bs.modal', function(e) {
+            const button = e.relatedTarget;
+            if (button && button.classList.contains('btn-edit-dokter')) {
+                modalTitle.textContent = 'Edit Dokter';
+                dokterIdInput.value = button.getAttribute('data-id');
+                dokterNamaInput.value = button.getAttribute('data-nama');
+                dokterSpesialisInput.value = button.getAttribute('data-spesialis');
+                dokterNoHpInput.value = button.getAttribute('data-no_hp');
+            } else {
+                modalTitle.textContent = 'Tambah Dokter';
+                dokterIdInput.value = '';
+                dokterNamaInput.value = '';
+                dokterSpesialisInput.value = '';
+                dokterNoHpInput.value = '';
             }
         });
-    });
-});
-</script>
 
+        document.querySelectorAll('.btn-hapus-data').forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Yakin hapus data?',
+                        text: 'Data yang dihapus tidak bisa dikembalikan.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, hapus',
+                        cancelButtonText: 'Batal',
+                        confirmButtonColor: '#d33'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = href;
+                        }
+                    });
+                } else if (confirm('Yakin hapus data?')) {
+                    window.location.href = href;
+                }
+            });
+        });
+    });
+</script>

@@ -22,14 +22,26 @@ class User extends MY_Controller
 
     public function simpan()
     {
+        $user_id = $this->input->post('user_id');
         $data = [
             'nama' => $this->input->post('nama'),
             'username' => $this->input->post('username'),
-            'password' => md5($this->input->post('password')),
             'role' => $this->input->post('role')
         ];
 
-        $this->db->insert('users', $data);
+        $password = $this->input->post('password');
+        if (!empty($password)) {
+            $data['password'] = md5($password);
+        }
+
+        if (!empty($user_id)) {
+            $this->db->update('users', $data, ['id' => $user_id]);
+            $this->session->set_flashdata('success', 'Data user berhasil diperbarui.');
+        } else {
+            $data['password'] = md5($password);
+            $this->db->insert('users', $data);
+            $this->session->set_flashdata('success', 'Data user berhasil ditambahkan.');
+        }
 
         redirect('user');
     }
@@ -37,6 +49,7 @@ class User extends MY_Controller
     public function hapus($id)
     {
         $this->db->delete('users', ['id' => $id]);
+        $this->session->set_flashdata('success', 'Data user berhasil dihapus.');
 
         redirect('user');
     }
