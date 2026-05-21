@@ -3,7 +3,7 @@
 <div class="panel-card">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0">List Data Resep</h5>
-        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahResep">Tambah Resep</button>
+        <button class="btn btn-primary btn-sm" id="btnBukaTambahResep" data-bs-toggle="modal" data-bs-target="#modalTambahResep">Tambah Resep</button>
     </div>
     <form method="get" action="<?= site_url('resep') ?>" class="row g-2 mb-3">
         <div class="col-md-10">
@@ -32,6 +32,7 @@
                 <td>Rp <?= number_format($r->total) ?></td>
                 <td>
                     <a href="<?= site_url('resep/detail/' . $r->id) ?>" class="btn btn-info btn-sm" target="_blank">Detail</a>
+                    <button type="button" class="btn btn-warning btn-sm btn-edit-resep" data-id="<?= $r->id ?>" data-bs-toggle="modal" data-bs-target="#modalTambahResep">Edit</button>
                     <a href="<?= site_url('resep/hapus/' . $r->id) ?>" class="btn btn-danger btn-sm btn-hapus-data">Hapus</a>
                 </td>
             </tr>
@@ -43,16 +44,17 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Form Detail Resep</h5>
+                <h5 class="modal-title" id="modalResepTitle">Form Detail Resep</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <form method="post" action="<?= site_url('resep/simpan') ?>" id="formResep">
+                <input type="hidden" name="resep_id" id="resepId" value="">
                 <div class="modal-body">
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label class="form-label">Pasien</label>
-                            <select name="pasien_id" class="form-control" required>
+                            <select name="pasien_id" id="pasienId" class="form-control" required>
                                 <option value="">Pilih Pasien</option>
                                 <?php foreach ($pasien as $p): ?>
                                     <option value="<?= $p->id ?>"><?= $p->nama ?></option>
@@ -61,7 +63,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Dokter</label>
-                            <select name="dokter_id" class="form-control" required>
+                            <select name="dokter_id" id="dokterId" class="form-control" required>
                                 <option value="">Pilih Dokter</option>
                                 <?php foreach ($dokter as $d): ?>
                                     <option value="<?= $d->id ?>"><?= $d->nama ?></option>
@@ -70,7 +72,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Tanggal</label>
-                            <input type="date" name="tanggal" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                            <input type="date" name="tanggal" id="tanggalResep" class="form-control" value="<?= date('Y-m-d') ?>" required>
                         </div>
                     </div>
 
@@ -116,7 +118,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Simpan Resep</button>
+                    <button type="submit" class="btn btn-success" id="btnSimpanResep">Simpan Resep</button>
                 </div>
             </form>
         </div>
@@ -132,6 +134,13 @@
         const grandTotal = document.getElementById('grandTotal');
         const bayar = document.getElementById('bayar');
         const kembalian = document.getElementById('kembalian');
+        const resepIdInput = document.getElementById('resepId');
+        const pasienIdInput = document.getElementById('pasienId');
+        const dokterIdInput = document.getElementById('dokterId');
+        const tanggalResepInput = document.getElementById('tanggalResep');
+        const modalTitle = document.getElementById('modalResepTitle');
+        const btnSimpanResep = document.getElementById('btnSimpanResep');
+        const btnBukaTambahResep = document.getElementById('btnBukaTambahResep');
 
         function hitungRingkasan() {
             let total = 0;
@@ -157,7 +166,7 @@
             hitungRingkasan();
         }
 
-        function tambahBaris() {
+        function tambahBaris(item = null) {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>
@@ -166,12 +175,15 @@
                         ${obatOptions}
                     </select>
                 </td>
-                <td><input type="number" min="1" name="qty[]" class="form-control qty-input" value="1" required></td>
+                <td><input type="number" min="1" name="qty[]" class="form-control qty-input" value="${item && item.qty ? item.qty : 1}" required></td>
                 <td><input type="number" name="harga[]" class="form-control harga-input" readonly></td>
                 <td><input type="number" name="subtotal[]" class="form-control subtotal-input" readonly></td>
                 <td><button type="button" class="btn btn-danger btn-sm btn-hapus-baris">Hapus</button></td>
             `;
             tbody.appendChild(tr);
+            if (item && item.obat_id) {
+                tr.querySelector('.obat-select').value = String(item.obat_id);
+            }
             hitungBaris(tr);
 
             tr.querySelector('.obat-select').addEventListener('change', function () { hitungBaris(tr); });
@@ -181,6 +193,43 @@
                 hitungRingkasan();
             });
         }
+
+        function resetFormResep() {
+            resepIdInput.value = '';
+            pasienIdInput.value = '';
+            dokterIdInput.value = '';
+            tanggalResepInput.value = '<?= date('Y-m-d') ?>';
+            tbody.innerHTML = '';
+            bayar.value = '';
+            modalTitle.textContent = 'Form Detail Resep';
+            btnSimpanResep.textContent = 'Simpan Resep';
+            tambahBaris();
+        }
+
+        btnBukaTambahResep.addEventListener('click', resetFormResep);
+
+        document.querySelectorAll('.btn-edit-resep').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                fetch('<?= site_url('resep/edit_data/') ?>' + id)
+                    .then(res => res.json())
+                    .then(data => {
+                        resepIdInput.value = data.header.id || '';
+                        pasienIdInput.value = data.header.pasien_id || '';
+                        dokterIdInput.value = data.header.dokter_id || '';
+                        tanggalResepInput.value = data.header.tanggal || '<?= date('Y-m-d') ?>';
+                        tbody.innerHTML = '';
+                        bayar.value = '';
+                        modalTitle.textContent = 'Edit Resep';
+                        btnSimpanResep.textContent = 'Update Resep';
+                        if (Array.isArray(data.detail) && data.detail.length > 0) {
+                            data.detail.forEach(function (item) { tambahBaris(item); });
+                        } else {
+                            tambahBaris();
+                        }
+                    });
+            });
+        });
 
         btnTambah.addEventListener('click', tambahBaris);
         bayar.addEventListener('input', hitungRingkasan);

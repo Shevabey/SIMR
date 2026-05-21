@@ -32,6 +32,7 @@ class Resep extends MY_Controller
 
     public function simpan()
     {
+        $resepId = (int) $this->input->post('resep_id');
         $obatIds = $this->input->post('obat_id');
         $qtys = $this->input->post('qty');
         $hargas = $this->input->post('harga');
@@ -53,9 +54,14 @@ class Resep extends MY_Controller
             'total' => $grandTotal
         ];
 
-        $this->db->insert('resep', $resep);
-
-        $resep_id = $this->db->insert_id();
+        if ($resepId > 0) {
+            $this->db->where('id', $resepId)->update('resep', $resep);
+            $resep_id = $resepId;
+            $this->db->delete('resep_detail', ['resep_id' => $resep_id]);
+        } else {
+            $this->db->insert('resep', $resep);
+            $resep_id = $this->db->insert_id();
+        }
         $detailRows = [];
 
         for ($i = 0; $i < count($obatIds); $i++) {
@@ -79,6 +85,32 @@ class Resep extends MY_Controller
         $this->db->trans_complete();
 
         redirect('resep');
+    }
+
+    public function edit_data($id)
+    {
+        $id = (int) $id;
+        $header = $this->db->get_where('resep', ['id' => $id])->row_array();
+        if (!$header) {
+            return $this->output
+                ->set_content_type('application/json')
+                ->set_status_header(404)
+                ->set_output(json_encode(['message' => 'Data tidak ditemukan']));
+        }
+
+        $detail = $this->db->query("
+            SELECT obat_id, qty, harga, subtotal
+            FROM resep_detail
+            WHERE resep_id = ?
+            ORDER BY id ASC
+        ", [$id])->result_array();
+
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'header' => $header,
+                'detail' => $detail
+            ]));
     }
 
     public function detail($id)

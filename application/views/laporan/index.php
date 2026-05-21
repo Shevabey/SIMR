@@ -14,7 +14,7 @@
             <button type="submit" class="btn btn-primary">Filter</button>
             <a href="<?= site_url('laporan') ?>" class="btn btn-secondary">Reset</a>
             <a href="<?= site_url('laporan/export_csv') ?>" class="btn btn-success">Export CSV</a>
-            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modalTambahLaporan">Tambah Laporan</button>
+            <!-- <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modalTambahLaporan">Tambah Laporan</button> -->
         </div>
     </form>
 </div>
@@ -55,32 +55,33 @@
 </div>
 
 <div class="panel-card">
-<table class="table table-bordered">
-
-    <tr>
-        <th>No</th>
-        <th>Tanggal</th>
-        <th>Pasien</th>
-        <th>Dokter</th>
-        <th>Total</th>
-    </tr>
-
-    <?php $no = 1; foreach ($laporan as $l): ?>
+    <table class="table table-bordered">
 
         <tr>
-            <td><?= $no++ ?></td>
-            <td><?= $l->tanggal ?></td>
-            <td><?= $l->pasien_nama ?></td>
-            <td><?= $l->dokter_nama ?></td>
-            <td>Rp <?= number_format($l->total) ?></td>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>Pasien</th>
+            <th>Dokter</th>
+            <th>Total</th>
         </tr>
 
-    <?php endforeach; ?>
+        <?php $no = 1;
+        foreach ($laporan as $l): ?>
 
-</table>
+            <tr>
+                <td><?= $no++ ?></td>
+                <td><?= $l->tanggal ?></td>
+                <td><?= $l->pasien_nama ?></td>
+                <td><?= $l->dokter_nama ?></td>
+                <td>Rp <?= number_format($l->total) ?></td>
+            </tr>
+
+        <?php endforeach; ?>
+
+    </table>
 </div>
 
-<div class="modal fade" id="modalTambahLaporan" tabindex="-1" aria-hidden="true">
+<!-- <div class="modal fade" id="modalTambahLaporan" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -92,4 +93,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
