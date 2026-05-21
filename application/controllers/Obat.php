@@ -35,7 +35,21 @@ class Obat extends MY_Controller
 
     public function hapus($id)
     {
+        $id = (int) $id;
+        if ($id <= 0) {
+            redirect('obat');
+            return;
+        }
+
+        $isUsed = $this->db->where('obat_id', $id)->count_all_results('resep_detail') > 0;
+        if ($isUsed) {
+            $this->session->set_flashdata('error', 'Obat tidak bisa dihapus karena sudah dipakai pada data resep.');
+            redirect('obat');
+            return;
+        }
+
         $this->db->delete('obat', ['id' => $id]);
+        $this->session->set_flashdata('success', 'Data obat berhasil dihapus.');
 
         redirect('obat');
     }

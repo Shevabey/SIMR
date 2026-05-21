@@ -35,7 +35,21 @@ class Dokter extends MY_Controller
 
     public function hapus($id)
     {
+        $id = (int) $id;
+        if ($id <= 0) {
+            redirect('dokter');
+            return;
+        }
+
+        $isUsed = $this->db->where('dokter_id', $id)->count_all_results('resep') > 0;
+        if ($isUsed) {
+            $this->session->set_flashdata('error', 'Dokter tidak bisa dihapus karena sudah dipakai pada data resep.');
+            redirect('dokter');
+            return;
+        }
+
         $this->db->delete('dokter', ['id' => $id]);
+        $this->session->set_flashdata('success', 'Data dokter berhasil dihapus.');
 
         redirect('dokter');
     }

@@ -32,7 +32,7 @@
                 <td>Rp <?= number_format($r->total) ?></td>
                 <td>
                     <a href="<?= site_url('resep/detail/' . $r->id) ?>" class="btn btn-info btn-sm" target="_blank">Detail</a>
-                    <a href="<?= site_url('resep/print/' . $r->id) ?>" class="btn btn-secondary btn-sm" target="_blank">Print</a>
+                    <a href="<?= site_url('resep/hapus/' . $r->id) ?>" class="btn btn-danger btn-sm btn-hapus-data">Hapus</a>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -186,4 +186,32 @@
         bayar.addEventListener('input', hitungRingkasan);
         tambahBaris();
     })();
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.btn-hapus-data').forEach(function (button) {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Yakin hapus resep?',
+                    text: 'Data resep dan detailnya akan dihapus permanen.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#d33'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = href;
+                    }
+                });
+            } else if (confirm('Yakin hapus resep?')) {
+                window.location.href = href;
+            }
+        });
+    });
+});
 </script>

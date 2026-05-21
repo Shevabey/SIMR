@@ -1,5 +1,12 @@
 <h3 class="page-title">Dokter Interface</h3>
 
+<?php if ($this->session->flashdata('error')): ?>
+    <div class="alert alert-danger"><?= $this->session->flashdata('error') ?></div>
+<?php endif; ?>
+<?php if ($this->session->flashdata('success')): ?>
+    <div class="alert alert-success"><?= $this->session->flashdata('success') ?></div>
+<?php endif; ?>
+
 <div class="row">
 
     <div class="col-md-12">
@@ -34,7 +41,7 @@
                     <td><?= $d->no_hp ?></td>
 
                     <td>
-                        <a href="<?= site_url('dokter/hapus/' . $d->id) ?>" class="btn btn-danger btn-sm">
+                        <a href="<?= site_url('dokter/hapus/' . $d->id) ?>" class="btn btn-danger btn-sm btn-hapus-data">
                             Hapus
                         </a>
                     </td>
@@ -76,3 +83,32 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.btn-hapus-data').forEach(function (button) {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Yakin hapus data?',
+                    text: 'Data yang dihapus tidak bisa dikembalikan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#d33'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = href;
+                    }
+                });
+            } else if (confirm('Yakin hapus data?')) {
+                window.location.href = href;
+            }
+        });
+    });
+});
+</script>
+

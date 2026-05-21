@@ -19,7 +19,7 @@ class Resep extends MY_Controller
             $like = '%' . $q . '%';
             $params = [$like, $like, $like];
         }
-        $sql .= " ORDER BY r.id DESC ";
+        $sql .= " ORDER BY r.tanggal DESC, r.id DESC ";
         $data['resep'] = $this->db->query($sql, $params)->result();
         $data['q'] = $q;
 
@@ -105,5 +105,21 @@ class Resep extends MY_Controller
     public function print($id)
     {
         $this->detail($id);
+    }
+
+    public function hapus($id)
+    {
+        $id = (int) $id;
+        if ($id <= 0) {
+            redirect('resep');
+            return;
+        }
+
+        $this->db->trans_start();
+        $this->db->delete('resep_detail', ['resep_id' => $id]);
+        $this->db->delete('resep', ['id' => $id]);
+        $this->db->trans_complete();
+
+        redirect('resep');
     }
 }

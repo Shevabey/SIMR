@@ -36,7 +36,21 @@ class Pasien extends MY_Controller
 
     public function hapus($id)
     {
+        $id = (int) $id;
+        if ($id <= 0) {
+            redirect('pasien');
+            return;
+        }
+
+        $isUsed = $this->db->where('pasien_id', $id)->count_all_results('resep') > 0;
+        if ($isUsed) {
+            $this->session->set_flashdata('error', 'Pasien tidak bisa dihapus karena sudah dipakai pada data resep.');
+            redirect('pasien');
+            return;
+        }
+
         $this->db->delete('pasien', ['id' => $id]);
+        $this->session->set_flashdata('success', 'Data pasien berhasil dihapus.');
 
         redirect('pasien');
     }
